@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "99Freelas Monitor",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Monitora novos projetos no 99Freelas e te notifica em tempo real com alerta visual, sonoro e e-mail.",
   "permissions": [
     "notifications",

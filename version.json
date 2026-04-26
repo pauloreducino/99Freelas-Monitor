@@ -1,6 +1,7 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.8",
   "changelog": [
+    "Correção de layout da página de projetos (CSS externo para respeitar CSP)",
     "Verificação de até 3 páginas de projetos por ciclo",
     "Fila inteligente de até 4 notificações simultâneas na tela",
     "Retry automático em caso de falha de rede (tenta em 1 min)",
