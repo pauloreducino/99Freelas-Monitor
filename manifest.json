@@ -12,7 +12,8 @@
   ],
   "host_permissions": [
     "https://www.99freelas.com.br/*",
-    "https://api.emailjs.com/*"
+    "https://api.emailjs.com/*",
+    "https://raw.githubusercontent.com/*"
   ],
   "background": {
     "service_worker": "background.js"

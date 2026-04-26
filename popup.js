@@ -290,10 +290,35 @@ function stopAutoRefresh() {
   clearInterval(refreshInterval);
 }
 
+// ─── Banner de atualização ────────────────────────────────────
+
+async function renderUpdateBanner() {
+  const { updateInfo, dismissedVersion } = await chrome.storage.local.get(['updateInfo', 'dismissedVersion']);
+  if (!updateInfo) return;
+  if (dismissedVersion === updateInfo.version) return;
+
+  $('updateVersion').textContent  = updateInfo.version;
+  $('updateLink').href            = updateInfo.url || '#';
+
+  const list = $('updateChangelog');
+  list.innerHTML = (updateInfo.changelog || [])
+    .map(item => `<li>${escapeHtml(item)}</li>`)
+    .join('');
+
+  $('updateBanner').classList.remove('hidden');
+}
+
+$('updateDismiss').addEventListener('click', async () => {
+  const { updateInfo } = await chrome.storage.local.get('updateInfo');
+  if (updateInfo) await chrome.storage.local.set({ dismissedVersion: updateInfo.version });
+  $('updateBanner').classList.add('hidden');
+});
+
 // ─── Init ─────────────────────────────────────────────────────
 
 window.addEventListener('load', () => {
   startAutoRefresh();
+  renderUpdateBanner();
   // Limpar badge ao abrir o popup
   chrome.runtime.sendMessage({ type: 'clear-badge' });
 });

@@ -1,0 +1,13 @@
+{
+  "version": "1.0.7",
+  "changelog": [
+    "Verificação de até 3 páginas de projetos por ciclo",
+    "Fila inteligente de até 4 notificações simultâneas na tela",
+    "Retry automático em caso de falha de rede (tenta em 1 min)",
+    "Limpeza automática do storage a cada 2 dias",
+    "Correção de caracteres especiais nas notificações (ç, ã, é...)",
+    "Novos ícones personalizados para a extensão",
+    "Validação de URLs e Content Security Policy definida"
+  ],
+  "url": "https://github.com/pauloreducino/99Freelas-Monitor"
+}

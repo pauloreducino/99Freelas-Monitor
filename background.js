@@ -5,6 +5,11 @@
 const ALARM_NAME    = 'freelas-check';
 const ALARM_CLEANUP = 'freelas-cleanup';
 const ALARM_RETRY   = 'freelas-retry';
+const ALARM_UPDATE  = 'freelas-update';
+
+// Após publicar no GitHub, substitua pelo caminho raw do seu repositório:
+// https://raw.githubusercontent.com/SEU_USUARIO/99freelas-monitor/main/version.json
+const UPDATE_CHECK_URL = '';
 const BASE_URL      = 'https://www.99freelas.com.br';
 const PROJECTS_URL  = `${BASE_URL}/projects`;
 const PAGES_TO_SCAN      = 3;           // quantas páginas verificar por ciclo
@@ -33,13 +38,16 @@ chrome.runtime.onInstalled.addListener(async () => {
   });
   await setupAlarm(3);
   setupCleanupAlarm();
+  setupUpdateAlarm();
   await checkNewProjects();
+  await checkForUpdate();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   const { isMonitoring, interval = 3 } = await chrome.storage.local.get(['isMonitoring', 'interval']);
   if (isMonitoring) await setupAlarm(interval);
   setupCleanupAlarm();
+  setupUpdateAlarm();
 });
 
 // ─── Alarmes ─────────────────────────────────────────────────
@@ -51,9 +59,15 @@ async function setupAlarm(minutes) {
 
 function setupCleanupAlarm() {
   chrome.alarms.get(ALARM_CLEANUP, existing => {
-    if (!existing) {
+    if (!existing)
       chrome.alarms.create(ALARM_CLEANUP, { periodInMinutes: CLEANUP_DAYS * 24 * 60 });
-    }
+  });
+}
+
+function setupUpdateAlarm() {
+  chrome.alarms.get(ALARM_UPDATE, existing => {
+    if (!existing)
+      chrome.alarms.create(ALARM_UPDATE, { periodInMinutes: 24 * 60 }); // 1x por dia
   });
 }
 
@@ -66,6 +80,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
   if (alarm.name === ALARM_CLEANUP) {
     await cleanupStorage();
+    return;
+  }
+  if (alarm.name === ALARM_UPDATE) {
+    await checkForUpdate();
   }
 });
 
@@ -445,6 +463,40 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
     chrome.tabs.create({ url: chrome.runtime.getURL('projects.html') });
   }
 });
+
+// ─── Verificação de atualização ──────────────────────────────
+
+function isNewerVersion(remote, current) {
+  const r = remote.split('.').map(Number);
+  const c = current.split('.').map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((r[i] || 0) > (c[i] || 0)) return true;
+    if ((r[i] || 0) < (c[i] || 0)) return false;
+  }
+  return false;
+}
+
+async function checkForUpdate() {
+  if (!UPDATE_CHECK_URL) return;
+  try {
+    const res  = await fetch(UPDATE_CHECK_URL, { cache: 'no-cache' });
+    if (!res.ok) return;
+    const data = await res.json();
+    const current = chrome.runtime.getManifest().version;
+    if (data.version && isNewerVersion(data.version, current)) {
+      await chrome.storage.local.set({
+        updateInfo: {
+          version:   data.version,
+          changelog: data.changelog || [],
+          url:       data.url || '',
+        },
+      });
+      console.log(`[Monitor] Atualização disponível: v${data.version}`);
+    }
+  } catch (e) {
+    console.warn('[Monitor] Check de atualização falhou:', e.message);
+  }
+}
 
 // ─── Limpeza automática do storage ───────────────────────────
 
