@@ -1,0 +1,23 @@
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Dependências (quando/se houver)
+node_modules/
+
+# Variáveis de ambiente e segredos
+.env
+.env.local
+*.key
+*.pem
+
+# Monetização / licenciamento (implementar futuramente)
+license-server/
+license.config.js

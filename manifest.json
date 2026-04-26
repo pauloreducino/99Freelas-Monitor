@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "99Freelas Monitor",
+  "version": "1.0.7",
+  "description": "Monitora novos projetos no 99Freelas e te notifica em tempo real com alerta visual, sonoro e e-mail.",
+  "permissions": [
+    "notifications",
+    "storage",
+    "alarms",
+    "offscreen",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.99freelas.com.br/*",
+    "https://api.emailjs.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "99Freelas Monitor",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; object-src 'none';"
+  }
+}

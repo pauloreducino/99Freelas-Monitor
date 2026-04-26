@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>99Freelas Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">⚡</span>
+      <div>
+        <div class="logo-title">99Freelas Monitor</div>
+        <div class="logo-sub">Alertas em tempo real</div>
+      </div>
+    </div>
+    <label class="toggle-switch" title="Ativar/Pausar monitoramento">
+      <input type="checkbox" id="toggleMonitoring" checked>
+      <span class="toggle-slider"></span>
+    </label>
+  </header>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot" id="statusDot"></div>
+    <span class="status-text" id="statusText">Verificando...</span>
+    <span class="status-time" id="lastCheckTime"></span>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="recentes">Novos projetos</button>
+    <button class="tab" data-tab="config">Configurações</button>
+  </div>
+
+  <!-- ─── TAB: DASHBOARD ─── -->
+  <div class="tab-content active" id="tab-dashboard">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="statTotal">–</div>
+        <div class="stat-label">Projetos vistos</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-value" id="statNew">–</div>
+        <div class="stat-label">Novos detectados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statChecks">–</div>
+        <div class="stat-label">Verificações</div>
+      </div>
+    </div>
+
+    <div class="interval-row">
+      <span class="interval-label">⏱ Intervalo de verificação</span>
+      <div class="interval-controls">
+        <select id="intervalSelect" class="select-input">
+          <option value="1">1 min</option>
+          <option value="2">2 min</option>
+          <option value="3" selected>3 min</option>
+          <option value="5">5 min</option>
+          <option value="10">10 min</option>
+          <option value="15">15 min</option>
+          <option value="30">30 min</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-primary" id="btnCheckNow">
+        <span id="btnCheckIcon">🔍</span> Verificar agora
+      </button>
+      <button class="btn-secondary" id="btnOpenFreelas">
+        Abrir site
+      </button>
+    </div>
+
+    <button class="btn-all-projects" id="btnAllProjects">📋 Ver todos os projetos detectados</button>
+
+    <div id="errorBox" class="error-box hidden">
+      <span class="error-icon">⚠️</span>
+      <span id="errorMsg"></span>
+    </div>
+
+  </div>
+
+  <!-- ─── TAB: RECENTES ─── -->
+  <div class="tab-content" id="tab-recentes">
+    <div class="section-header">
+      <span>Projetos novos detectados</span>
+      <button class="btn-ghost" id="btnClearHistory">Limpar</button>
+    </div>
+    <div id="projectsList" class="projects-list">
+      <div class="empty-state">Nenhum projeto novo detectado ainda.</div>
+    </div>
+  </div>
+
+  <!-- ─── TAB: CONFIGURAÇÕES ─── -->
+  <div class="tab-content" id="tab-config">
+
+    <!-- Filtros -->
+    <div class="config-section">
+      <div class="config-section-title">🎯 Filtros de projeto</div>
+      <div class="config-section-desc">Deixe em branco para monitorar todos os projetos.</div>
+
+      <label class="field-label">Palavras-chave (separadas por vírgula)</label>
+      <input type="text" id="filterKeywords" class="text-input" placeholder="ex: next.js, react, wordpress">
+
+      <label class="field-label" style="margin-top: 10px;">Categorias (separadas por vírgula)</label>
+      <input type="text" id="filterCategories" class="text-input" placeholder="ex: desenvolvimento web, design">
+
+      <button class="btn-primary" id="btnSaveFilters" style="margin-top: 12px; width: 100%;">Salvar filtros</button>
+    </div>
+
+    <!-- E-mail -->
+    <div class="config-section">
+      <div class="config-section-title">📧 Notificação por e-mail (EmailJS)</div>
+      <div class="config-section-desc">
+        Crie uma conta gratuita em <a href="https://emailjs.com" target="_blank" class="link">emailjs.com</a> e configure abaixo.
+      </div>
+
+      <label class="toggle-row">
+        <span>Ativar e-mail</span>
+        <label class="toggle-switch sm">
+          <input type="checkbox" id="emailEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </label>
+
+      <div id="emailFields" class="email-fields hidden">
+        <label class="field-label">Service ID</label>
+        <input type="text" id="emailServiceId" class="text-input mono" placeholder="service_xxxxxxx">
+
+        <label class="field-label">Template ID</label>
+        <input type="text" id="emailTemplateId" class="text-input mono" placeholder="template_xxxxxxx">
+
+        <label class="field-label">Public Key</label>
+        <input type="text" id="emailPublicKey" class="text-input mono" placeholder="xxxxxxxxxxxxxxxxxxxx">
+
+        <label class="field-label">Seu e-mail (destino)</label>
+        <input type="email" id="emailTo" class="text-input" placeholder="seu@email.com">
+
+        <div class="email-hint">
+          💡 No template do EmailJS, use as variáveis:<br>
+          <code>{{project_title}}</code>, <code>{{project_url}}</code>, <code>{{project_category}}</code>, <code>{{project_budget}}</code>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btnSaveEmail" style="margin-top: 12px; width: 100%;">Salvar configurações de e-mail</button>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>99Freelas Monitor v1.0.7</span>
+    <button class="btn-ghost sm" id="btnClearBadge">Limpar badge</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
